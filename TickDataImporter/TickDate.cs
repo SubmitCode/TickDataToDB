@@ -24,7 +24,7 @@ namespace TickDataImporter
             if (values.Length > 0)
             {
                 this.InstrumentID = instrumentID;
-                DateTime = values[0] + " " + values[1];
+                DateTime = values[0].Substring(3, 2) + "-" + values[0].Substring(0, 2) + "-" + values[0].Substring(6, 4) + "  " + values[1];
                 Price = Convert.ToDouble(values[2]);
                 Volueme = Convert.ToInt16(values[3]);
                 MarketFlag = values[4];
