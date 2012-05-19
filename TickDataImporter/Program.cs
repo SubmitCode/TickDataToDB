@@ -19,36 +19,69 @@ namespace TickDataImporter
             //conn.Close();
 
             string[] paths = Directory.GetFiles(@"M:\TickData\TickData", "*.zip", SearchOption.AllDirectories);
+            string[] zipPahts = null;
             foreach (var item in paths)
             {
                 Console.WriteLine(item);
                 ExtractZip(item, @"C:\Temp\Zip");
-                string[] zipPahts = Directory.GetFiles(@"C:\Temp\Zip", "*.gz", SearchOption.AllDirectories);
+                zipPahts = Directory.GetFiles(@"C:\Temp\Zip", "*.gz", SearchOption.AllDirectories);
                 foreach (var path in zipPahts)
                 {
                     Console.WriteLine("     " + path);
                     ExtractGz(path, @"C:\Temp\Zip\RawFiles");
+                    string[] ascFilePaths = Directory.GetFiles(@"C:\Temp\Zip\RawFiles", "*.asc", SearchOption.AllDirectories);
+                    ascFilePaths = ascFilePaths.Where(x => Path.GetFileName(x).Length == 20).ToArray();
+                    foreach (var ascFile in ascFilePaths)
+                    {
+                        WriteTickDataToDB(ReadAsciFile(ascFile));
+                        File.Delete(ascFile);
+                    }
+                    File.Delete(path);
                 }
             }
             Console.ReadLine();
         }
 
-        private static void WriteFileToDb(string path)
+        private static List<TickDate> ReadAsciFile(string path)
+        {
+            string InstrumendID = Path.GetFileName(path).Substring(0, 5);
+            var tickentryList = new List<TickDate>();
+            using (var reader = new StreamReader(path))
+            {
+                string line = "";
+
+                while ((line = reader.ReadLine()) != null)
+                {
+                    tickentryList.Add(new TickDate(line, InstrumendID));
+                }
+            }
+            return tickentryList;
+        }
+
+        private static void WriteTickDataToDB(List<TickDate> lstTickdata)
         {
             SqlConnection conn = new SqlConnection(@"Data Source=mwa\sqlexpress;Initial Catalog=TickData;Integrated Security=True");
             SqlCommand sqlCmd = new SqlCommand();
-            using(var reader = new StreamReader(path))
-	        {
-                conn.Open();
-                string line = "";
-                string[] values = null;
-                while ((line = reader.ReadLine()) != null)
-	            {
-                    values = line.Split(',');
-                    sqlCmd.CommandText = "INSERT INTO
-	            }
-	        }
+            foreach (var item in lstTickdata)
+            {
+                sqlCmd.CommandText = string.Format(
+                        @"INSERT INTO [TickData].[dbo].[tblTickData]
+                           ([InstrumentID]
+                           ,[DateTime]
+                           ,[Price]
+                           ,[Volume]
+                           ,[MarketFlag]
+                           ,[SalesCondition]
+                           ,[ExcluedFlag]
+                           ,[UnfilteredPrice])
+                     VALUES
+                           ('{0}','{1}',{2},{3},'{4}',)", item.GetTickDataEntries());
+                sqlCmd.ExecuteNonQuery();
+            }
+            conn.Close();
         }
+
+        //        private static
 
         private static void ExtractZip(string file, string extractToFolder)
         {
