@@ -15,14 +15,14 @@ namespace TickDataImporter
     internal class Program
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(Program));
-        private static int counter = 1;
+        //private static int counter = 1;
 
         private static void Main(string[] args)
         {
             if (Directory.Exists(@"C:\Temp\Zip"))
                 Directory.Delete(@"C:\Temp\Zip", true);
             Directory.CreateDirectory(@"C:\Temp\Zip\RawFiles");
-            string[] paths = Directory.GetFiles(@"M:\TickData\TickData\FUT", "*.zip", SearchOption.AllDirectories);
+            string[] paths = Directory.GetFiles(@"M:\TickData\TickData\FUT\A\AD", "*.zip", SearchOption.AllDirectories);
             //paths = paths.Skip(272).ToArray();
             string[] zipPahts = null;
             foreach (var item in paths)
@@ -44,7 +44,7 @@ namespace TickDataImporter
                             try
                             {
                                 log.Info(Path.GetFileName(ascFile));
-                                WriteFileNameToDB(Path.GetFileName(ascFile));
+                                //WriteFileNameToDB(Path.GetFileName(ascFile));
                                 var lst = ReadAsciFile(ascFile);
                                 WriteTickEntryToFile(@"C:\Temp\Zip\RawFiles\" + Path.GetFileNameWithoutExtension(ascFile) + ".txt", lst);
                                 //WriteTickDataToDB(ReadAsciFile(ascFile));
@@ -91,8 +91,7 @@ namespace TickDataImporter
             {
                 foreach (var item in ticks)
                 {
-                    writer.WriteLine(counter + "," + item);
-                    counter++;
+                    writer.WriteLine(item);
                 }
             }
         }
@@ -104,7 +103,8 @@ namespace TickDataImporter
             {
                 conn.Open();
                 SqlCommand sqlCmd = new SqlCommand();
-                sqlCmd.CommandText = string.Format("BULK INSERT [TickData].[dbo].[tblTickData] FROM '{0}' WITH (FIELDTERMINATOR = ',',ROWTERMINATOR = '\n')", filenmae);
+                sqlCmd.CommandText = string.Format("BULK INSERT [TickData].[dbo].[tblTickData] FROM '{0}' WITH (FORMATFILE = '{1}')", filenmae,
+                    @"C:\Users\Willi\Documents\visual studio 2010\Projects\TickDataToDB\TickDataImporter\Otherstuff\bulkFormat.fmt");
                 sqlCmd.Connection = conn;
                 sqlCmd.ExecuteNonQuery();
                 File.Delete(filenmae);

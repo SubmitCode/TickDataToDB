@@ -1,0 +1,10 @@
+10.0
+8
+1       SQLCHAR             0       10      ","     2     InstrumentID                       Latin1_General_CI_AS
+2       SQLCHAR             0       24      ","     3     DateTime                           ""
+3       SQLCHAR             0       30      ","     4     Price                              ""
+4       SQLCHAR             0       12      ","     5     Volume                             ""
+5       SQLCHAR             0       2       ","     6     MarketFlag                         Latin1_General_CI_AS
+6       SQLCHAR             0       12      ","     7     SalesCondition                     ""
+7       SQLCHAR             0       2       ","     8     ExcludeFlag                        Latin1_General_CI_AS
+8       SQLCHAR             0       30      "\r\n"     9    UnfilteredPrice                    ""
