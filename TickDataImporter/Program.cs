@@ -15,15 +15,15 @@ namespace TickDataImporter
     internal class Program
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(Program));
+        private static int counter = 1;
 
         private static void Main(string[] args)
         {
             if (Directory.Exists(@"C:\Temp\Zip"))
-            {
                 Directory.Delete(@"C:\Temp\Zip", true);
-                Directory.CreateDirectory(@"C:\Temp\Zip\RawFiles");
-            }
-            string[] paths = Directory.GetFiles(@"M:\TickData\TickData", "*.zip", SearchOption.AllDirectories);
+            Directory.CreateDirectory(@"C:\Temp\Zip\RawFiles");
+            string[] paths = Directory.GetFiles(@"M:\TickData\TickData\FUT", "*.zip", SearchOption.AllDirectories);
+            //paths = paths.Skip(272).ToArray();
             string[] zipPahts = null;
             foreach (var item in paths)
             {
@@ -35,24 +35,28 @@ namespace TickDataImporter
                     zipPahts = zipPahts.Where(x => !Path.GetFileName(x).Contains("SUMMARY")).ToArray();
                     foreach (var path in zipPahts)
                     {
-                        try
+                        //log.Info(Path.GetFileName(path));
+                        ExtractGz(path, @"C:\Temp\Zip\RawFiles");
+                        string[] ascFilePaths = Directory.GetFiles(@"C:\Temp\Zip\RawFiles", "*.asc", SearchOption.AllDirectories);
+                        ascFilePaths = ascFilePaths.Where(x => Path.GetFileName(x).Length == 20).ToArray();
+                        foreach (var ascFile in ascFilePaths)
                         {
-                            //log.Info(Path.GetFileName(path));
-                            ExtractGz(path, @"C:\Temp\Zip\RawFiles");
-                            string[] ascFilePaths = Directory.GetFiles(@"C:\Temp\Zip\RawFiles", "*.asc", SearchOption.AllDirectories);
-                            ascFilePaths = ascFilePaths.Where(x => Path.GetFileName(x).Length == 20).ToArray();
-                            foreach (var ascFile in ascFilePaths)
+                            try
                             {
-                                log.Info("Import File" + Path.GetFileName(ascFile));
+                                log.Info(Path.GetFileName(ascFile));
                                 WriteFileNameToDB(Path.GetFileName(ascFile));
-                                WriteTickDataToDB(ReadAsciFile(ascFile));
+                                var lst = ReadAsciFile(ascFile);
+                                WriteTickEntryToFile(@"C:\Temp\Zip\RawFiles\" + Path.GetFileNameWithoutExtension(ascFile) + ".txt", lst);
+                                //WriteTickDataToDB(ReadAsciFile(ascFile));
+                                WriteBulkInsertToDB(Path.Combine(Path.GetDirectoryName(ascFile), Path.GetFileNameWithoutExtension(ascFile) + ".txt"));
                                 File.Delete(ascFile);
                             }
+                            catch (Exception e)
+                            {
+                                log.Error(e);
+                            }
                         }
-                        catch (Exception e)
-                        {
-                            log.Error(e);
-                        }
+
                         File.Delete(path);
                     }
                 }
@@ -81,6 +85,40 @@ namespace TickDataImporter
             return tickentryList;
         }
 
+        private static void WriteTickEntryToFile(string toFile, List<TickDate> ticks)
+        {
+            using (var writer = new StreamWriter(toFile))
+            {
+                foreach (var item in ticks)
+                {
+                    writer.WriteLine(counter + "," + item);
+                    counter++;
+                }
+            }
+        }
+
+        private static void WriteBulkInsertToDB(string filenmae)
+        {
+            SqlConnection conn = new SqlConnection(@"Data Source=mwa\sqlexpress;Initial Catalog=TickData;Integrated Security=True");
+            try
+            {
+                conn.Open();
+                SqlCommand sqlCmd = new SqlCommand();
+                sqlCmd.CommandText = string.Format("BULK INSERT [TickData].[dbo].[tblTickData] FROM '{0}' WITH (FIELDTERMINATOR = ',',ROWTERMINATOR = '\n')", filenmae);
+                sqlCmd.Connection = conn;
+                sqlCmd.ExecuteNonQuery();
+                File.Delete(filenmae);
+            }
+            catch (Exception e)
+            {
+                log.Error(e);
+            }
+            finally
+            {
+                conn.Close();
+            }
+        }
+
         private static void WriteFileNameToDB(string fileName)
         {
             SqlConnection conn = new SqlConnection(@"Data Source=mwa\sqlexpress;Initial Catalog=TickData;Integrated Security=True");
@@ -100,10 +138,11 @@ namespace TickDataImporter
             SqlConnection conn = new SqlConnection(@"Data Source=mwa\sqlexpress;Initial Catalog=TickData;Integrated Security=True");
             conn.Open();
             SqlCommand sqlCmd = new SqlCommand();
+            var builder = new StringBuilder();
+            sqlCmd.CommandTimeout = 1000;
             foreach (var item in lstTickdata)
             {
-                sqlCmd.Connection = conn;
-                sqlCmd.CommandText = string.Format(
+                builder.AppendLine(string.Format(
                         @"INSERT INTO [TickData].[dbo].[tblTickData]
                            ([InstrumentID]
                            ,[DateTime]
@@ -114,9 +153,11 @@ namespace TickDataImporter
                            ,[ExcludeFlag]
                            ,[UnfilteredPrice])
                      VALUES
-                           ('{0}','{1}',{2},{3},'{4}',{5},'{6}',{7})", item.GetTickDataEntries());
-                sqlCmd.ExecuteNonQuery();
+                           ('{0}','{1}',{2},{3},'{4}',{5},'{6}',{7})", item.GetTickDataEntries()));
             }
+            sqlCmd.CommandText = builder.ToString();
+            sqlCmd.Connection = conn;
+            sqlCmd.ExecuteNonQuery();
             conn.Close();
         }
 
@@ -156,7 +197,6 @@ namespace TickDataImporter
                         // Copy the decompression stream
                         // into the output file.
                         Decompress.CopyTo(outFile);
-                        Console.WriteLine("         Decompressed: {0}", fi.Name);
                     }
                 }
             }

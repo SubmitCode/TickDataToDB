@@ -61,5 +61,17 @@ namespace TickDataImporter
                 UnfilteredPrice.ToString()
             };
         }
+
+        public override string ToString()
+        {
+            return InstrumentID + "," +
+                DateTime + "," +
+                Price.ToString() + "," +
+                Volueme.ToString() + "," +
+                MarketFlag + "," +
+                SalesCondition.ToString() + "," +
+                ExcludeFlag + "," +
+                UnfilteredPrice.ToString();
+        }
     }
 }
