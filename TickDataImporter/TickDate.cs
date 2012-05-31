@@ -5,7 +5,7 @@ using System.Text;
 
 namespace TickDataImporter
 {
-    internal class TickDate
+    internal class TickDate : ITickDate
     {
         private string InstrumentID;
         private string DateTime;
@@ -72,6 +72,26 @@ namespace TickDataImporter
                 SalesCondition.ToString() + "," +
                 ExcludeFlag + "," +
                 UnfilteredPrice.ToString();
+        }
+
+        public string GetSymbol()
+        {
+            return InstrumentID;
+        }
+
+        public DateTime GetDateTime()
+        {
+            return Convert.ToDateTime(DateTime);
+        }
+
+        public double GetPrice()
+        {
+            return Price;
+        }
+
+        public long GetVolume()
+        {
+            return Volueme;
         }
     }
 }

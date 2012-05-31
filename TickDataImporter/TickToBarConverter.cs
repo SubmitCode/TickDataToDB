@@ -12,16 +12,16 @@ namespace TickDataImporter
 
     internal class TickToBarConverter
     {
-        private List<TickDate> lstTickData;
+        private List<ITickDate> lstTickData;
 
         private TickToBarConverter() { }
 
-        public TickToBarConverter(IEnumerable<TickDate> tickData)
+        public TickToBarConverter(IEnumerable<ITickDate> tickData)
         {
-            this.lstTickData = (List<TickDate>)tickData;
+            this.lstTickData = (List<ITickDate>)tickData;
         }
 
-        public IEnumerable<IBaraData> GetBarData(IntradayFrequency frequency)
+        public IEnumerable<IBaraDate> GetBarData(IntradayFrequency frequency)
         {
             throw new NotImplementedException();
         }
