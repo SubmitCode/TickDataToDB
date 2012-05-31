@@ -3,9 +3,18 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TickDataImporter", "TickDataImporter\TickDataImporter.csproj", "{2DB6061E-902D-4531-AD24-8EC9BD6CE996}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestProject1", "TestProject1\TestProject1.csproj", "{1CF53790-EBB7-4628-BE1C-8584CA2FCFAB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{26977F86-F5AA-4773-9D98-73F538F2D7F0}"
+	ProjectSection(SolutionItems) = preProject
+		Local.testsettings = Local.testsettings
+		TickDataImporter1.vsmdi = TickDataImporter1.vsmdi
+		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = TickDataImporter.vsmdi
+		CategoryFile = TickDataImporter1.vsmdi
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,6 +35,16 @@ Global
 		{2DB6061E-902D-4531-AD24-8EC9BD6CE996}.Release|Mixed Platforms.Build.0 = Release|x86
 		{2DB6061E-902D-4531-AD24-8EC9BD6CE996}.Release|x86.ActiveCfg = Release|x86
 		{2DB6061E-902D-4531-AD24-8EC9BD6CE996}.Release|x86.Build.0 = Release|x86
+		{1CF53790-EBB7-4628-BE1C-8584CA2FCFAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CF53790-EBB7-4628-BE1C-8584CA2FCFAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CF53790-EBB7-4628-BE1C-8584CA2FCFAB}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{1CF53790-EBB7-4628-BE1C-8584CA2FCFAB}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{1CF53790-EBB7-4628-BE1C-8584CA2FCFAB}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1CF53790-EBB7-4628-BE1C-8584CA2FCFAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CF53790-EBB7-4628-BE1C-8584CA2FCFAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CF53790-EBB7-4628-BE1C-8584CA2FCFAB}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{1CF53790-EBB7-4628-BE1C-8584CA2FCFAB}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{1CF53790-EBB7-4628-BE1C-8584CA2FCFAB}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
