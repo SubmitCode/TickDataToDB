@@ -130,5 +130,45 @@ namespace TickDataImporter
                 Directory.Delete(pathTempFolder, true);
             Directory.CreateDirectory(pathTempFolder);
         }
+
+        private void ExtractZipIntoRawfiles(string pathFile, string pathTempFolder)
+        {
+            ExtractZip(pathFile, pathTempFolder);
+            var pathGzFiles = Directory.GetFiles(pathTempFolder, "*.gz", SearchOption.AllDirectories);
+            pathGzFiles = pathGzFiles.Where(x => !Path.GetFileName(x).Contains("SUMMARY")).ToArray();
+            foreach (var path in pathGzFiles)
+            {
+                //log.Info(Path.GetFileName(path));
+                ExtractGz(path, pathTempFolder);
+                File.Delete(path);
+            }
+        }
+
+        private List<TickDate> ReadAsciFile(string path)
+        {
+            string InstrumendID = Path.GetFileName(path).Substring(0, 5);
+            var tickentryList = new List<TickDate>();
+            using (var reader = new StreamReader(path))
+            {
+                string line = "";
+
+                while ((line = reader.ReadLine()) != null)
+                {
+                    tickentryList.Add(new TickDate(line, InstrumendID));
+                }
+            }
+            return tickentryList;
+        }
+
+        private void WriteTickEntryToFile(string toFile, List<ITickDate> ticks)
+        {
+            using (var writer = new StreamWriter(toFile))
+            {
+                foreach (var item in ticks)
+                {
+                    writer.WriteLine(item);
+                }
+            }
+        }
     }
 }
