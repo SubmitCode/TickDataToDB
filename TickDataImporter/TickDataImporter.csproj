@@ -50,9 +50,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Interface1.cs" />
+    <Compile Include="IBarDate.cs" />
+    <Compile Include="ITickDate.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TickDataFileManager.cs" />
     <Compile Include="TickDate.cs" />
     <Compile Include="TickToBarConverter.cs" />
   </ItemGroup>
