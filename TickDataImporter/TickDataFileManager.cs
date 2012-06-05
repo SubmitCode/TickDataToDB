@@ -35,7 +35,7 @@ namespace TickDataImporter
             }
         }
 
-        private static void ExtractGz(string filePath, string toFolder)
+        private void ExtractGz(string filePath, string toFolder)
         {
             var fi = new FileInfo(filePath);
             // Get the stream of the source file.

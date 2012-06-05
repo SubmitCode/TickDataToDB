@@ -15,11 +15,13 @@ namespace TickDataImporter
     internal class Program
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(Program));
-        //private static int counter = 1;
 
         private static void Main(string[] args)
         {
+            var tickFileManagerh
+            Console.ReadKey();
         }
 
+        //private static int counter = 1;
     }
 }

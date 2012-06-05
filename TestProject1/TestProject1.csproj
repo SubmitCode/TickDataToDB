@@ -56,7 +56,10 @@
     </CodeAnalysisDependentAssemblyPaths>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CurrentFolder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TickDataFileManagerTest.cs" />
+    <Compile Include="TickDateTest.cs" />
     <Compile Include="TickToBarConverterTest.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -67,6 +70,9 @@
       <Project>{2DB6061E-902D-4531-AD24-8EC9BD6CE996}</Project>
       <Name>TickDataImporter</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="TestFiles\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

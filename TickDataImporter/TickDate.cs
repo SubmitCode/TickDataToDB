@@ -7,16 +7,14 @@ namespace TickDataImporter
 {
     internal class TickDate : ITickDate
     {
-        private string InstrumentID;
         private string DateTime;
-        private double Price;
-        private int Volueme;
-        private string MarketFlag;
-        private int SalesCondition;
         private string ExcludeFlag;
+        private string InstrumentID;
+        private string MarketFlag;
+        private double Price;
+        private string SalesCondition;
         private double UnfilteredPrice;
-
-        private TickDate() { }
+        private int Volueme;
 
         public TickDate(string tickentry, string instrumentID)
         {
@@ -30,13 +28,13 @@ namespace TickDataImporter
                 MarketFlag = values[4];
                 if (values.Length == 5)
                 {
-                    SalesCondition = 0;
+                    SalesCondition = "";
                     ExcludeFlag = "";
                     UnfilteredPrice = 0;
                 }
                 else if (values.Length == 8)
                 {
-                    SalesCondition = Convert.ToInt16(values[5]);
+                    SalesCondition = values[5];
                     ExcludeFlag = values[6];
                     UnfilteredPrice = Convert.ToDouble(values[7]);
                 }
@@ -45,6 +43,23 @@ namespace TickDataImporter
             {
                 throw new Exception("No Tickdata entry identified");
             }
+        }
+
+        private TickDate() { }
+
+        public DateTime GetDateTime()
+        {
+            return Convert.ToDateTime(DateTime);
+        }
+
+        public double GetPrice()
+        {
+            return Price;
+        }
+
+        public string GetSymbol()
+        {
+            return InstrumentID;
         }
 
         public string[] GetTickDataEntries()
@@ -62,6 +77,11 @@ namespace TickDataImporter
             };
         }
 
+        public long GetVolume()
+        {
+            return Volueme;
+        }
+
         public override string ToString()
         {
             return InstrumentID + "," +
@@ -72,26 +92,6 @@ namespace TickDataImporter
                 SalesCondition.ToString() + "," +
                 ExcludeFlag + "," +
                 UnfilteredPrice.ToString();
-        }
-
-        public string GetSymbol()
-        {
-            return InstrumentID;
-        }
-
-        public DateTime GetDateTime()
-        {
-            return Convert.ToDateTime(DateTime);
-        }
-
-        public double GetPrice()
-        {
-            return Price;
-        }
-
-        public long GetVolume()
-        {
-            return Volueme;
         }
     }
 }
