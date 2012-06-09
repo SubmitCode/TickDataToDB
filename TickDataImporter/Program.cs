@@ -18,7 +18,7 @@ namespace TickDataImporter
 
         private static void Main(string[] args)
         {
-            var tickFileManagerh
+            //var tickFileManagerh
             Console.ReadKey();
         }
 

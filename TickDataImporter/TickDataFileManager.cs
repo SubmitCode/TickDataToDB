@@ -16,8 +16,22 @@ namespace TickDataImporter
 
         private TickDataFileManager() { }
 
+        string PathDirectoryTickData;
+        string PathTemporaryOutputfolder;
+
         public TickDataFileManager(string pathDirectoryTickData, string pathTemporaryOutputfolder)
         {
+            PathDirectoryTickData = pathDirectoryTickData;
+            PathTemporaryOutputfolder = pathTemporaryOutputfolder;
+        }
+
+        public TickDataFileManager(string[] pathsTickFiles, string pathTemporaryOutputfolder)
+        {
+            DeleteAndCreateFolderStructure(pathTemporaryOutputfolder);
+            foreach (var item in pathsTickFiles)
+            {
+                ExtractZipIntoRawfiles(item, pathTemporaryOutputfolder);
+            }
         }
 
         private void ExtractZip(string file, string extractToFolder)
@@ -59,71 +73,6 @@ namespace TickDataImporter
             }
         }
 
-        private void WriteFileNameToDB(string fileName)
-        {
-            SqlConnection conn = new SqlConnection(@"Data Source=mwa\sqlexpress;Initial Catalog=TickData;Integrated Security=True");
-            conn.Open();
-            SqlCommand sqlCmd = new SqlCommand();
-            sqlCmd.Connection = conn;
-            sqlCmd.CommandText = string.Format(
-                    @"INSERT INTO [TickData].[dbo].[tblImported]
-                        ([FileName])
-                    VALUES
-                        ('{0}')", fileName);
-            sqlCmd.ExecuteNonQuery();
-        }
-
-        private void WriteTickDataToDB(List<TickDate> lstTickdata)
-        {
-            SqlConnection conn = new SqlConnection(@"Data Source=mwa\sqlexpress;Initial Catalog=TickData;Integrated Security=True");
-            conn.Open();
-            SqlCommand sqlCmd = new SqlCommand();
-            var builder = new StringBuilder();
-            sqlCmd.CommandTimeout = 1000;
-            foreach (var item in lstTickdata)
-            {
-                builder.AppendLine(string.Format(
-                        @"INSERT INTO [TickData].[dbo].[tblTickData]
-                           ([InstrumentID]
-                           ,[DateTime]
-                           ,[Price]
-                           ,[Volume]
-                           ,[MarketFlag]
-                           ,[SalesCondition]
-                           ,[ExcludeFlag]
-                           ,[UnfilteredPrice])
-                     VALUES
-                           ('{0}','{1}',{2},{3},'{4}',{5},'{6}',{7})", item.GetTickDataEntries()));
-            }
-            sqlCmd.CommandText = builder.ToString();
-            sqlCmd.Connection = conn;
-            sqlCmd.ExecuteNonQuery();
-            conn.Close();
-        }
-
-        private void WriteBulkInsertToDB(string filenmae)
-        {
-            SqlConnection conn = new SqlConnection(@"Data Source=mwa\sqlexpress;Initial Catalog=TickData;Integrated Security=True");
-            try
-            {
-                conn.Open();
-                SqlCommand sqlCmd = new SqlCommand();
-                sqlCmd.CommandText = string.Format("BULK INSERT [TickData].[dbo].[tblTickData] FROM '{0}' WITH (FORMATFILE = '{1}')", filenmae,
-                    @"C:\Users\Willi\Documents\visual studio 2010\Projects\TickDataToDB\TickDataImporter\Otherstuff\bulkFormat.fmt");
-                sqlCmd.Connection = conn;
-                sqlCmd.ExecuteNonQuery();
-                File.Delete(filenmae);
-            }
-            catch (Exception e)
-            {
-                log.Error(e);
-            }
-            finally
-            {
-                conn.Close();
-            }
-        }
-
         private void DeleteAndCreateFolderStructure(string pathTempFolder)
         {
             if (Directory.Exists(pathTempFolder))
@@ -144,10 +93,16 @@ namespace TickDataImporter
             }
         }
 
-        private List<TickDate> ReadAsciFile(string path)
+        private void ConvertTickAsciFileIntoTickdateFile(string rawTickFile, string pathAsciFile)
+        {
+            var entries = ReadAsciFile(rawTickFile);
+            WriteTickEntryToFile(pathAsciFile, entries);
+        }
+
+        private List<ITickDate> ReadAsciFile(string path)
         {
             string InstrumendID = Path.GetFileName(path).Substring(0, 5);
-            var tickentryList = new List<TickDate>();
+            var tickentryList = new List<ITickDate>();
             using (var reader = new StreamReader(path))
             {
                 string line = "";

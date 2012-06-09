@@ -50,6 +50,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DatabaseManager.cs" />
     <Compile Include="IBarDate.cs" />
     <Compile Include="ITickDate.cs" />
     <Compile Include="Program.cs" />
